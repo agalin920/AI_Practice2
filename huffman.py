@@ -3,6 +3,32 @@ import collections
 from collections import defaultdict
 from tkinter import *
 import math
+import networkx as nx
+import matplotlib.pyplot as plt
+
+
+
+def buildTree(event):
+    G = nx.Graph()
+    G.add_node("a")
+    G.add_nodes_from(["b", "c"])
+
+    G.add_edge(1,2)
+    edge = ("d", "e")
+    G.add_edge(*edge)
+    edge = ("a", "b")
+    G.add_edge(*edge)
+
+    print("Nodes of graph: ")
+    print(G.nodes())
+    print("Edges of graph: ")
+    print(G.edges()) 
+
+    # adding a list of edges
+
+    nx.draw(G)
+    plt.savefig("simple_path.png") # save as png
+    plt.show() # display
 
 
 def setupWindow():
@@ -34,11 +60,13 @@ def formatString(event):
     resultEntry.insert(INSERT, "Character\tFrequency\tCode\n")
     total = 0
     for p in huff:
-        resultEntry.insert(INSERT, "  %s\t  %s\t  %s\n" % (p[0], symb2freq[p[0]], p[1]))
+        resultEntry.insert(INSERT, "   %s\t    %s\t     %s\n" % (p[0], symb2freq[p[0]], p[1]))
         total += len(p[1]) * symb2freq[p[0]]
 
+    efficiency = total/prevtotal * 100
+
     freq1LabelVar.set('Total bits = %s' % total)
-    resultVar.set('Efficiency = %s' % (total/prevtotal))
+    resultVar.set('Efficiency = %.2f' % efficiency + '%')
 
 
 def getFrequencies(inputCnt):
@@ -48,7 +76,7 @@ def getFrequencies(inputCnt):
     resultEntry2.insert(INSERT, "Character\tFrequency\tCode\n")
     for key, val in inputCnt.most_common():
         st = ('{0:b}'.format(c)).zfill(codeLength)
-        resultEntry2.insert(INSERT,"  %s\t  %s\t  %s\n" % (key, val, st))
+        resultEntry2.insert(INSERT,"   %s\t    %s\t     %s\n" % (key, val, st))
         c += 1
         total += val * len(st)
     freq2LabelVar.set('Total bits = %s' % total)
@@ -87,7 +115,7 @@ def buildWindow():
     submitButton.grid(row=2, column=1, sticky='w')
 
     seeTreeButton = Button(root, text="Generate tree")
-    seeTreeButton.bind("<Button-1>", formatString)
+    seeTreeButton.bind("<Button-1>", buildTree)
     seeTreeButton.grid(row=2, column=2, sticky='w')
 
     freq1LabelVar = StringVar()
