@@ -6,65 +6,52 @@ import math
 
 
 def setupWindow():
-    # Deleting previous values
-    l.grid(row=3, column=0, sticky='w')
+    # Setting up windows
+    encodedMessageLabel.grid(row=3, column=0, sticky='w')
     resultEntry.grid(row=4, column=0)
-
-
-
-    resultEntry.config(state=NORMAL)
-    resultEntry.tag_delete("myTags")
-    resultEntry.delete(1.0, END)
-
-
-    l2.grid(row=3, column=2, sticky='w')
+    nonEncodedLabel.grid(row=3, column=2, sticky='w')
     resultEntry2.grid(row=4, column=2)
-    l11.grid(row=5, column=0, sticky='w')
-    l22.grid(row=5, column=1, sticky='w')
-    l33.grid(row=6, column=0, sticky='w')
+    freq1Label.grid(row=5, column=0, sticky='w')
+    freq2Label.grid(row=5, column=2, sticky='w')
+    resultLabel.grid(row=6, column=0, sticky='w')
 
-
+    # Deleting previous values
+    resultEntry.config(state=NORMAL)
+    resultEntry.delete(1.0, END)
     resultEntry2.config(state=NORMAL)
     resultEntry2.delete(1.0, END)
-
-
 
 
 def formatString(event):
     setupWindow()
     str1 = str(inputString.get())
     symb2freq = collections.Counter(str1)
-
     prevtotal = getFrequencies(symb2freq)
 
     huff = encode(symb2freq)
 
-    print("Carácter\tFrecuencia\tCódigo")
     # Insert in window
-    resultEntry.insert(INSERT, "Carácter\tFrecuencia\tCódigo\n")
+    resultEntry.insert(INSERT, "Character\tFrequency\tCode\n")
     total = 0
     for p in huff:
         resultEntry.insert(INSERT, "  %s\t  %s\t  %s\n" % (p[0], symb2freq[p[0]], p[1]))
         total += len(p[1]) * symb2freq[p[0]]
-        print("%s\t\t%s\t\t%s" % (p[0], symb2freq[p[0]], p[1]))
-    tvar.set('Total bits = %s' % total)
 
-    efficiency = total/prevtotal
-
-    resultVar.set('Efficiency = %s' % efficiency)
+    freq1LabelVar.set('Total bits = %s' % total)
+    resultVar.set('Efficiency = %s' % (total/prevtotal))
 
 
 def getFrequencies(inputCnt):
     codeLength = math.ceil(math.log(len(inputCnt), 2))
     c = 0
     total = 0
-    resultEntry2.insert(INSERT, "Carácter\tFrecuencia\tCódigo\n")
+    resultEntry2.insert(INSERT, "Character\tFrequency\tCode\n")
     for key, val in inputCnt.most_common():
         st = ('{0:b}'.format(c)).zfill(codeLength)
         resultEntry2.insert(INSERT,"  %s\t  %s\t  %s\n" % (key, val, st))
         c += 1
         total += val * len(st)
-    tvar2.set('Total bits = %s' % total)
+    freq2LabelVar.set('Total bits = %s' % total)
     return total
 
 def encode(symb2freq):
@@ -84,45 +71,40 @@ def encode(symb2freq):
 def buildWindow():
     root = Tk()
 
+    global encodedMessageLabel, nonEncodedLabel, freq1LabelVar, \
+           freq2LabelVar, resultVar, resultEntry, resultEntry2, \
+           freq1Label, freq2Label, resultLabel, inputString
 
-    l1 = Label(root, text="Enter the message to encode:")
-    l1.grid(row=1, column=0)
-    global inputString
+    welcomelabel = Label(root, text="Enter the message to encode:")
+    welcomelabel.grid(row=1, column=0)
+
     inputString = Entry(root, width=50)
     inputString.grid(row=2, column=0)
 
 
     submitButton = Button(root, text="Submit")
     submitButton.bind("<Button-1>", formatString)
-    submitButton.grid(row=2, column=1, sticky='e')
+    submitButton.grid(row=2, column=1, sticky='w')
 
-    global l
-    l = Label(root, text="Encoded Message:")
-    global resultEntry
-    resultEntry = Text(root, height=12, width=33)
+    seeTreeButton = Button(root, text="Generate tree")
+    seeTreeButton.bind("<Button-1>", formatString)
+    seeTreeButton.grid(row=2, column=2, sticky='w')
 
-    global l2
-    l2 = Label(root, text="Non huffman encoding:")
-    global resultEntry2
-    resultEntry2 = Text(root, height=12, width=33)
-
-    global tvar, tvar2, resultVar
-    tvar = StringVar()
-    tvar2 = StringVar()
+    freq1LabelVar = StringVar()
+    freq2LabelVar = StringVar()
     resultVar = StringVar()
 
-    global l11
-    l11 = Label(root, textvariable=tvar)
+    encodedMessageLabel = Label(root, text="Encoded Message:")
+    nonEncodedLabel = Label(root, text="Non huffman encoding:")
+    freq1Label = Label(root, textvariable=freq1LabelVar)
+    freq2Label = Label(root, textvariable=freq2LabelVar)
+    resultLabel = Label(root, textvariable=resultVar)
 
-    global l22
-    l22 = Label(root, textvariable=tvar2)
-
-    global l33
-    l33 = Label(root, textvariable=resultVar)
-
+    resultEntry = Text(root, height=12, width=33)
+    resultEntry2 = Text(root, height=12, width=33)
 
     root.mainloop()
 
 # aaaaabbbbbbbbbccccccccccccdddddddddddddeeeeeeeeeeeeeeeefffffffffffffffffffffffffffffffffffffffffffff
-# AAAAAAAAAAEEEEEEEEEEEEEEEIIIIIIIIIIIISSSTTTTPPPPPPPPPPPPP\n
+# AAAAAAAAAAEEEEEEEEEEEEEEEIIIIIIIIIIIISSSTTTTPPPPPPPPPPPPP
 buildWindow()
