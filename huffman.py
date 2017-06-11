@@ -25,6 +25,11 @@ def setupWindow():
 def formatString(event):
     setupWindow()
     str1 = str(inputString.get())
+    if ".txt" in str1:
+        file = open(str1, 'r')
+        str1 = ""
+        for line in file:
+            str1 = str1 + line.strip()
     symb2freq = collections.Counter(str1)
     prevtotal = getFrequencies(symb2freq)
 
@@ -75,7 +80,7 @@ def buildWindow():
            freq2LabelVar, resultVar, resultEntry, resultEntry2, \
            freq1Label, freq2Label, resultLabel, inputString
 
-    welcomelabel = Label(root, text="Enter the message to encode:")
+    welcomelabel = Label(root, text="Enter the message to encode or path of .txt:")
     welcomelabel.grid(row=1, column=0)
 
     inputString = Entry(root, width=50)
