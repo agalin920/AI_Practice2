@@ -5,31 +5,33 @@ from tkinter import *
 import math
 import networkx as nx
 import matplotlib.pyplot as plt
-
+from graphviz import Digraph
 
 
 def buildTree(event):
-    G = nx.Graph()
-    G.add_node("a")
-    G.add_nodes_from(["b", "c"])
 
-    G.add_edge(1,2)
-    edge = ("d", "e")
-    G.add_edge(*edge)
-    edge = ("a", "b")
-    G.add_edge(*edge)
 
-    print("Nodes of graph: ")
-    print(G.nodes())
-    print("Edges of graph: ")
-    print(G.edges()) 
+    dot = Digraph(comment='Huffman encoding tree')
 
-    # adding a list of edges
+    str1 = str(inputString.get())
+    symb2freq = collections.Counter(str1)
 
-    nx.draw(G)
-    plt.savefig("simple_path.png") # save as png
-    plt.show() # display
+    huff = encode(symb2freq)
 
+    # all this needs to be worked
+
+    for i in huff:
+        pass
+    dot
+
+    dot.node('A', 'King Arthur')
+    dot.node('B', 'Sir Bevedere the Wise')
+    dot.node('L', 'Sir Lancelot the Brave')
+
+    dot.edges(['AB', 'AL'])
+    dot.edge('B', 'L', constraint='false')
+
+    dot.render('round-table.gv', view=True)
 
 def setupWindow():
     # Setting up windows
@@ -52,13 +54,18 @@ def formatString(event):
     setupWindow()
     str1 = str(inputString.get())
     if ".txt" in str1:
-        file = open(str1, 'r')
-        str1 = ""
-        for line in file:
-            str1 = str1 + line.strip()
+        try:
+            file = open(str1, 'r')
+            str1 = ""
+            for line in file:
+                str1 = str1 + line.strip()
+        except:
+            raise Exception("File path does not exist.")
+
     symb2freq = collections.Counter(str1)
     prevtotal = getFrequencies(symb2freq)
 
+    global huff
     huff = encode(symb2freq)
 
     # Insert in window
