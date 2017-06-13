@@ -3,35 +3,14 @@ import collections
 from collections import defaultdict
 from tkinter import *
 import math
-import networkx as nx
-import matplotlib.pyplot as plt
 from graphviz import Digraph
 
 
 def buildTree(event):
-
-
-    dot = Digraph(comment='Huffman encoding tree')
-
-    str1 = str(inputString.get())
-    symb2freq = collections.Counter(str1)
-
-    huff = encode(symb2freq)
-
-    # all this needs to be worked
-
-    for i in huff:
-        pass
-    dot
-
-    dot.node('A', 'King Arthur')
-    dot.node('B', 'Sir Bevedere the Wise')
-    dot.node('L', 'Sir Lancelot the Brave')
-
-    dot.edges(['AB', 'AL'])
-    dot.edge('B', 'L', constraint='false')
-
-    dot.render('round-table.gv', view=True)
+    try:
+        dot.render('tree.gv', view=True)
+    except:
+        raise Exception("Please close the file before generating tree.")
 
 def setupWindow():
     # Setting up windows
@@ -42,6 +21,7 @@ def setupWindow():
     freq1Label.grid(row=5, column=0, sticky='w')
     freq2Label.grid(row=5, column=2, sticky='w')
     resultLabel.grid(row=6, column=0, sticky='w')
+    seeTreeButton.grid(row=2, column=2, sticky='w')
 
     # Deleting previous values
     resultEntry.config(state=NORMAL)
@@ -95,16 +75,67 @@ def getFrequencies(inputCnt):
     return total
 
 def encode(symb2freq):
+
+    global dot
+    dot = Digraph(comment='Huffman encoding tree')
+
+    c = 65
     heap = [[wt, [sym, ""]] for sym, wt in symb2freq.items()]
+
     heapify(heap)
+
+
+    nodestack = {}
+
     while len(heap) > 1:
+        added = 0
         lo = heappop(heap)
         hi = heappop(heap)
+
+        dot_lo = str(lo[0]) + ' | ' + str(lo[1][0])
+        dot_hi = str(hi[0]) + ' | ' + str(hi[1][0])
+
+        orc = (chr(c))
+        dot.node(chr(c), str(lo[0] + hi[0]))
+        nodestack[chr(c)] = lo[0] + hi[0]
+        c += 1
+
+        if lo[0] not in nodestack.values():
+            dot.node(chr(c), dot_lo)
+            dot_lo_c = chr(c)
+            nodestack[chr(c)] = lo
+            c += 1
+            added += 1
+        else:
+            for k, v in nodestack.items():
+                if v == lo[0]:
+                    dot_lo_c = k
+                    break
+
+        if hi[0] not in nodestack.values():
+            dot.node(chr(c), dot_hi)
+            dot_hi_c = chr(c)
+            nodestack[chr(c)] = hi
+            added += 1
+        else:
+            for k, v in nodestack.items():
+                if v == hi[0]:
+                    dot_hi_c = k
+                    break
+
+
+
+        # extra edges added just to add the labelzz
+        dot.edge(orc, dot_lo_c, label='0')
+        dot.edge(orc, dot_hi_c, label='1')
+
+
         for pair in lo[1:]:
             pair[1] = '0' + pair[1]
         for pair in hi[1:]:
             pair[1] = '1' + pair[1]
         heappush(heap, [lo[0] + hi[0]] + lo[1:] + hi[1:])
+        c += 1
     return sorted(heappop(heap)[1:], key=lambda p: (len(p[-1]), p))
 
 
@@ -113,7 +144,7 @@ def buildWindow():
 
     global encodedMessageLabel, nonEncodedLabel, freq1LabelVar, \
            freq2LabelVar, resultVar, resultEntry, resultEntry2, \
-           freq1Label, freq2Label, resultLabel, inputString
+           freq1Label, freq2Label, resultLabel, inputString, seeTreeButton
 
     welcomelabel = Label(root, text="Enter the message to encode or path of .txt:")
     welcomelabel.grid(row=1, column=0)
@@ -128,7 +159,6 @@ def buildWindow():
 
     seeTreeButton = Button(root, text="Generate tree")
     seeTreeButton.bind("<Button-1>", buildTree)
-    seeTreeButton.grid(row=2, column=2, sticky='w')
 
     freq1LabelVar = StringVar()
     freq2LabelVar = StringVar()
