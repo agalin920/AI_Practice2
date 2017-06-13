@@ -21,6 +21,7 @@ def setupWindow():
     freq1Label.grid(row=5, column=0, sticky='w')
     freq2Label.grid(row=5, column=2, sticky='w')
     resultLabel.grid(row=6, column=0, sticky='w')
+    test.grid(row=7, column=0, sticky='w')
     seeTreeButton.grid(row=2, column=2, sticky='w')
 
     # Deleting previous values
@@ -54,12 +55,18 @@ def formatString(event):
     for p in huff:
         resultEntry.insert(INSERT, "   %s\t    %s\t     %s\n" % (p[0], symb2freq[p[0]], p[1]))
         total += len(p[1]) * symb2freq[p[0]]
-
+        for i in str1:
+            str1 = str1.replace(p[0], p[1])
+    file2 = open('result.txt', 'w')
+    file2.write(str1)
     efficiency = total/prevtotal * 100
 
     freq1LabelVar.set('Total bits = %s' % total)
     resultVar.set('Efficiency = %.2f' % efficiency + '%')
-
+    #  prints huffman code in file
+    testVar.set('Coded message => see result.txt')
+    #  prints huffman code in window, not fitted
+    #  testVar.set('Coded message = %s' % str1)
 
 def getFrequencies(inputCnt):
     codeLength = math.ceil(math.log(len(inputCnt), 2))
@@ -144,7 +151,8 @@ def buildWindow():
 
     global encodedMessageLabel, nonEncodedLabel, freq1LabelVar, \
            freq2LabelVar, resultVar, resultEntry, resultEntry2, \
-           freq1Label, freq2Label, resultLabel, inputString, seeTreeButton
+           freq1Label, freq2Label, resultLabel, inputString, seeTreeButton, \
+           test, testVar
 
     welcomelabel = Label(root, text="Enter the message to encode or path of .txt:")
     welcomelabel.grid(row=1, column=0)
@@ -163,12 +171,14 @@ def buildWindow():
     freq1LabelVar = StringVar()
     freq2LabelVar = StringVar()
     resultVar = StringVar()
+    testVar = StringVar()
 
     encodedMessageLabel = Label(root, text="Encoded Message:")
     nonEncodedLabel = Label(root, text="Non huffman encoding:")
     freq1Label = Label(root, textvariable=freq1LabelVar)
     freq2Label = Label(root, textvariable=freq2LabelVar)
     resultLabel = Label(root, textvariable=resultVar)
+    test = Label(root, textvariable=testVar)
 
     resultEntry = Text(root, height=12, width=33)
     resultEntry2 = Text(root, height=12, width=33)
