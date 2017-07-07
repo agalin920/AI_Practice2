@@ -1,1 +1,2 @@
-# AI_Practice2
+# Huffman Encoding
+Python implementation of huffman encoding with GUI and node tree grapher
